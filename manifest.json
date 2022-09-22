@@ -1,0 +1,10 @@
+{
+    "id": "obsidian-plugin-template-vue",
+    "name": "PluginTemplate",
+    "version": "0.0.1",
+    "minAppVersion": "0.16.0",
+    "description": "PluginTemplate",
+    "author": "Hank",
+    "authorUrl": "https://github.com/zjhcn",
+    "isDesktopOnly": false
+}
