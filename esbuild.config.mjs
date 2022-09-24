@@ -1,7 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from 'builtin-modules'
-import pluginVue from 'esbuild-plugin-vue-next'
 
 import sassPlugin from './packages/esbuild-plugin-sass/index.js';
 
@@ -20,7 +19,6 @@ esbuild.build({
         js: banner,
     },
     plugins: [
-        pluginVue(),
         // @ts-ignore
         sassPlugin({
             outName: "styles"

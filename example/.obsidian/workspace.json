@@ -1,0 +1,145 @@
+{
+  "main": {
+    "id": "355bfef72024a013",
+    "type": "split",
+    "children": [
+      {
+        "id": "feb964620cb1e4c6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c953ef0dcaf39b47",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Embeds.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a68261a12c1e13b5",
+    "type": "split",
+    "children": [
+      {
+        "id": "6cd451741e92b234",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f6295e9fd832f1c8",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "9af8f3d1f5765326",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "85a8fb6080090903",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9cda219285628117",
+    "type": "split",
+    "children": [
+      {
+        "id": "dd8f107218c47178",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8ef28a8919ac70eb",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Embeds.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "932a3cc806e0bf5e",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Embeds.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "bf5400e0d67ad4b6",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "b925a23da2bfb0ba",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Embeds.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "c953ef0dcaf39b47",
+  "lastOpenFiles": [
+    "Hello, World!.md",
+    "Embeds.md",
+    "Javascript.md"
+  ]
+}

@@ -1,61 +1,99 @@
-import { Plugin } from "obsidian";
-import { App } from "vue";
+import { DEFAULT_VARIANTS, Variant } from "./settings";
+import "./styles.scss";
 
-import { createPiniaApp } from "src/vue";
+import { Plugin, PluginManifest, App } from "obsidian";
+import { getCodeByPreviewMode, getCodeByReadMode } from "./utils";
+import { RunCodeSettingsTab } from "./RunCodeSettingsTab";
+import { Sandbox } from "./Sandbox";
 
-import { DEFAULT_SETTINGS } from "./default_settings";
-import { ISetting } from "./obsidian_vue.type";
-import { ObVueSettingsTab } from "./setting/Setting";
+interface RunCodeHTMLElement extends HTMLElement {
+  __runCodeRegister?: boolean;
+}
 
-import { exampleStatusBar } from "./status-bar/example";
-import { exampleCommand } from "./command/example";
-import { exampleComplexCommand } from "./command/example-complex";
-import { exampleEditorCommand } from "./command/example-editor";
-import { exampleRibbon } from "./ribbon/example";
-import { useDefaultSettingStore } from "./vue/store";
+interface RunCodeSettings {
+  variants: Record<string, Variant>;
+}
 
-export default class ObsidianVueTemplate extends Plugin implements ISetting {
-  settingsTab!: ObVueSettingsTab;
-  settingsStore!: ReturnType<typeof useDefaultSettingStore>;
-  dummyVueApp!: App;
-  basePath!: string;
+const DEFAULT_SETTINGS: RunCodeSettings = {
+  variants: DEFAULT_VARIANTS,
+};
 
-  get settings() {
-    return this.settingsStore.settings;
+export default class RunCode extends Plugin {
+  // This field stores your plugin settings.
+  settings: RunCodeSettings = DEFAULT_SETTINGS;
+  sandbox: Sandbox;
+
+  constructor(app: App, pluginManifest: PluginManifest) {
+    super(app, pluginManifest);
+    this.sandbox = new Sandbox(app, this);
   }
-
-  set settings(newSetting: any) {
-    this.settingsStore.reset(newSetting);
-  }
-
-  async onload() {
-    this.dummyVueApp = createPiniaApp(this);
-    this.settingsStore = useDefaultSettingStore();
-
-    await this.loadSettings();
-
-    this.settingsTab = new ObVueSettingsTab(this, {
-      onSettingsChange: async (newSettings) => {
-        this.settings = newSettings;
-        await this.saveSettings();
-      },
-    });
-
-    exampleRibbon(this);
-    exampleStatusBar(this);
-
-    exampleCommand(this);
-    exampleComplexCommand(this);
-    exampleEditorCommand(this);
-  }
-
-  onunload() {}
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings = Object.assign(DEFAULT_SETTINGS, await this.loadData());
   }
 
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+
+  async onload() {
+    console.log("Loading Snippets-plugin");
+    await this.loadSettings();
+
+    this.addSettingTab(new RunCodeSettingsTab(this.app, this));
+
+    // this.addCommand({
+    //   id: "snippets-plugin",
+    //   name: "Run",
+    //   callback: () => this.runSnippet(),
+    //   hotkeys: [
+    //     {
+    //       modifiers: ["Mod", "Shift"],
+    //       key: "Enter",
+    //     },
+    //   ],
+    // });
+
+    this.registerEvent(
+      this.app.workspace.on("active-leaf-change", (leaf) => {
+        if (!leaf) {
+          return;
+        }
+        this.registerContainerClick(leaf.view.containerEl);
+      })
+    );
+  }
+
+  registerContainerClick(el: RunCodeHTMLElement) {
+    if (el.__runCodeRegister) {
+      return;
+    }
+    el.__runCodeRegister = true;
+    el.addEventListener("click", this.containerClick.bind(this));
+  }
+
+  containerClick(event: MouseEvent) {
+    const target = event.target as RunCodeHTMLElement;
+    switch (target.tagName.toLowerCase()) {
+      case "div":
+        if (target.classList.contains("HyperMD-codeblock-end")) {
+          const processed = getCodeByPreviewMode(target);
+          this.sandbox.execCode(processed.lang.toLowerCase(), processed.code);
+        }
+        break;
+      case "pre":
+        if (
+          Array.from(target.classList).findIndex((name) =>
+            name.match(/language-.*/)
+          ) > -1
+        ) {
+          const processed = getCodeByReadMode(target);
+          this.sandbox.execCode(processed.lang.toLowerCase(), processed.code);
+        }
+        break;
+
+      default:
+        break;
+    }
   }
 }

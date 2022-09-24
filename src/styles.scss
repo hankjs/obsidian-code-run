@@ -1,0 +1,38 @@
+:root {
+  --code-run-button-content: "Run";
+}
+
+pre[class*="language-"]::after,
+.HyperMD-codeblock-end::after {
+  cursor: pointer;
+  content: var(--code-run-button-content);
+
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  font-family: var(--font-interface);
+
+  border-bottom-right-radius: 4px;
+  display: none;
+  padding: 6px 8px;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
+pre[class*="language-"]::after {
+  padding: 3px 4px;
+}
+
+pre[class*="language-"]:hover::after,
+.HyperMD-codeblock:hover ~ .HyperMD-codeblock-end::after,
+.HyperMD-codeblock-end:hover::after {
+  background-color: var(--background-secondary-alt);
+  display: block;
+}
+
+.code-runner-console {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
