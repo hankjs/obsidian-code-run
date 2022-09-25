@@ -1,25 +1,5 @@
 export const TEMP_DIR = "obsidian_code_run";
-import { ExecOptions } from "child_process";
-export interface Variant {
-  options?: ExecOptions & { encoding?: BufferEncoding };
-  template: string;
-  extname?: string;
-  runType?: RunType;
-  outputType: VariantOutput;
-}
-
-export enum RunType {
-  string = "string",
-  file = "file",
-}
-
-export enum VariantOutput {
-  notice = "notice",
-  modal = "modal",
-  console = "console",
-}
-
-export enum TemplatePlaceholder {}
+import { RunType, Variant, VariantOutput } from "./types";
 
 export const DEFAULT_VARIANTS: Record<string, Variant> = {
   python: {
@@ -29,20 +9,23 @@ export const DEFAULT_VARIANTS: Record<string, Variant> = {
   },
   "js,javascript": {
     template: 'node "{{src}}"',
-    extname: "js",
+    ext: "mjs",
     runType: RunType.file,
-    outputType: VariantOutput.console,
+    outputType: VariantOutput.modal,
   },
   "ts,typescript": {
     template: 'ts-node "{{src}}"',
-    extname: "ts",
+    ext: "ts",
+    options: {
+      cwd: ["{{vault_path}}", "./javascript"],
+    },
     runType: RunType.file,
     outputType: VariantOutput.modal,
   },
   c: {
     template:
       'gcc "{{src}}" -o "{{src_path}}/{{src_basename}}" && . "{{src_path}}/{{src_basename}}"',
-    extname: "c",
+    ext: "c",
     options: {
       shell: "pwsh",
     },

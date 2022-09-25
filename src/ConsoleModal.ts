@@ -4,12 +4,16 @@ import { t } from "./lang/helpers";
 export class ConsoleModal extends Modal {
   val!: string;
   consoleEl!: HTMLElement;
+  titleStatusEl?: HTMLSpanElement;
   constructor(app: App) {
     super(app);
   }
 
   onOpen() {
     this.titleEl.setText(t("CodeRunner Console"));
+    this.titleStatusEl = createEl("span");
+    this.titleStatusEl.addClass("code-runner-title-status");
+    this.titleEl.appendChild(this.titleStatusEl);
 
     this.clearButton(this.contentEl);
 
@@ -17,6 +21,10 @@ export class ConsoleModal extends Modal {
     this.consoleEl.addClass("code-runner-console");
     this.contentEl.appendChild(this.consoleEl);
     this.val = "";
+  }
+
+  setStatus(str: string) {
+    this.titleStatusEl?.setText(str);
   }
 
   setMessage(message: string) {

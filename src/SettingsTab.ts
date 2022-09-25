@@ -12,7 +12,7 @@ export class RunCodeSettingsTab extends PluginSettingTab {
 
   display(): void {
     const { containerEl } = this;
-    const settings = this.plugin.settings;
+    const { settings } = this.plugin;
     containerEl.empty();
 
     this.containerEl.createEl("h3", {
@@ -25,13 +25,11 @@ export class RunCodeSettingsTab extends PluginSettingTab {
       .addTextArea((text) => {
         text
           .setPlaceholder(JSON.stringify(DEFAULT_VARIANTS, null, 2))
-          .setValue(
-            JSON.stringify(this.plugin.settings.variants, null, 2) || ""
-          )
+          .setValue(JSON.stringify(settings.variants, null, 2) || "")
           .onChange(async (value) => {
             try {
               const newValue = JSON.parse(value);
-              this.plugin.settings.variants = newValue;
+              settings.variants = newValue;
               await this.plugin.saveSettings();
             } catch (e) {
               return false;

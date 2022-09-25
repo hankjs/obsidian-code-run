@@ -1,10 +1,12 @@
-import { DEFAULT_VARIANTS, Variant } from "./settings";
-import "./styles.scss";
-
 import { Plugin, PluginManifest, App } from "obsidian";
-import { getCodeByPreviewMode, getCodeByReadMode } from "./utils";
-import { RunCodeSettingsTab } from "./RunCodeSettingsTab";
+import { Variant } from "./types";
+import { RunCodeSettingsTab } from "./SettingsTab";
 import { Sandbox } from "./Sandbox";
+
+import { DEFAULT_VARIANTS } from "./settings";
+import { getCodeByPreviewMode, getCodeByReadMode } from "./utils";
+
+import "./styles.scss";
 
 interface RunCodeHTMLElement extends HTMLElement {
   __runCodeRegister?: boolean;

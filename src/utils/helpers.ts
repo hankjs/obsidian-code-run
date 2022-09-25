@@ -1,3 +1,6 @@
+import { SubpathResult } from "obsidian";
+import { codeBlockReg } from "./reg";
+
 export interface CodeParsed {
   lang: string;
   code: string;
@@ -39,6 +42,22 @@ export function getCodeByReadMode(el: HTMLElement): CodeParsed {
 
   return {
     lang,
+    code,
+  };
+}
+
+export function parseCodeBlock(source: string, subpathResult: SubpathResult) {
+  const matches = codeBlockReg.exec(
+    source.slice(subpathResult.start.offset, subpathResult.end?.offset)
+  );
+  if (!matches) {
+    return null;
+  }
+
+  const [raw, lang, code] = matches;
+
+  return {
+    lang: lang.trim(),
     code,
   };
 }
