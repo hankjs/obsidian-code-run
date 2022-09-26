@@ -35,6 +35,8 @@ pre[class*="language-"]:hover::after,
 .code-runner-console {
   white-space: pre-wrap;
   word-break: break-all;
+  -webkit-user-select: text;
+  user-select: text;
   border-radius: var(--radius-m);
   padding: var(--size-2-2);
   border: var(--modal-border-width) solid var(--modal-border-color);

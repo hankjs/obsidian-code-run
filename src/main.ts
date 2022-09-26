@@ -114,7 +114,8 @@ export default class RunCode extends Plugin {
           this.sandbox.execCode(
             processed.lang.toLowerCase(),
             processed.code,
-            view
+            view,
+            event.ctrlKey ? "ctrl" : event.altKey ? "alt" : ""
           );
         }
         break;
@@ -128,7 +129,8 @@ export default class RunCode extends Plugin {
           this.sandbox.execCode(
             processed.lang.toLowerCase(),
             processed.code,
-            view
+            view,
+            event.ctrlKey ? "ctrl" : event.altKey ? "alt" : ""
           );
         }
         break;

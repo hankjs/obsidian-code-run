@@ -9,6 +9,7 @@ export const DEFAULT_VARIANTS: Record<string, Variant> = {
   },
   "js,javascript": {
     template: 'node "{{src}}"',
+    ctrlTemplate: 'node --inspect-brk=9229 "{{src}}"',
     ext: "mjs",
     runType: RunType.file,
     outputType: VariantOutput.view,

@@ -22,6 +22,7 @@ export class Sandbox {
   view?: MarkdownView;
   consoleView?: ConsoleView;
   leaf?: WorkspaceLeaf;
+  eventKey: "ctrl" | "alt" | "" = "";
 
   constructor(app: App, plugin: RunCode) {
     this.app = app;
@@ -32,6 +33,7 @@ export class Sandbox {
   init() {
     this.output = "";
     this.notice && delete this.notice;
+    this.eventKey = "";
     delete this.view;
     delete this.lang;
     delete this.code;
@@ -41,13 +43,37 @@ export class Sandbox {
     delete this.childProcess;
   }
 
-  async execCode(lang: string, code: string, view: MarkdownView) {
-    const variant = this.getVariant(lang);
+  async execCode(
+    lang: string,
+    code: string,
+    view: MarkdownView,
+    eventKey: "ctrl" | "alt" | ""
+  ) {
+    let variant = this.getVariant(lang);
     if (!variant) {
       new PrefixNotice(`${lang} ${t("not find")}`);
       return;
     }
+    if (this.eventKey) {
+      switch (this.eventKey) {
+        case "alt":
+          variant = {
+            ...variant,
+            template: variant.altTemplate || variant.template,
+          };
+          break;
+
+        case "ctrl":
+        default:
+          variant = {
+            ...variant,
+            template: variant.ctrlTemplate || variant.template,
+          };
+          break;
+      }
+    }
     this.init();
+    this.eventKey = eventKey;
     this.view = view;
     this.lang = lang;
     this.code = code;
@@ -104,7 +130,7 @@ export class Sandbox {
     if (!this.view) {
       return;
     }
-    this.execCode(this.lang || "", this.code || "", this.view);
+    this.execCode(this.lang || "", this.code || "", this.view, this.eventKey);
   }
 
   print(outputType: VariantOutput, message: string) {

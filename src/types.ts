@@ -18,6 +18,8 @@ export interface Variant {
     cwd?: string[] | string;
   };
   template: string;
+  ctrlTemplate?: string;
+  altTemplate?: string;
   ext?: string;
   runType?: RunType;
   outputType: VariantOutput;

@@ -122,6 +122,7 @@ export class Parse {
   async resolveDependencies(variant: Variant, code: string, file: TFile) {
     const reg = new RegExp(includePlaceholderReg, "g");
     const matches = [...code.matchAll(reg)];
+    console.log("matches", matches);
     if (matches.length === 0) {
       return code;
     }
@@ -149,6 +150,7 @@ export class Parse {
       const subTrimmed = sub.trim();
       const linktext = linkTrimmed + subTrimmed;
       if (this.sourceMap.has(raw)) {
+        code = code.replaceAll(raw, this.sourceMap.get(raw)!.src);
         continue;
       }
 
@@ -210,6 +212,7 @@ export class Parse {
         src,
       });
     } // for matches
+    console.log("code", code);
     return code;
   }
 }
