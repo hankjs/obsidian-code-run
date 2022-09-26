@@ -1,11 +1,12 @@
 import { ChildProcess, exec } from "child_process";
-import { App, Notice, parseLinktext, resolveSubpath } from "obsidian";
+import { App, MarkdownView, Notice, WorkspaceLeaf } from "obsidian";
 import { t } from "./lang/helpers";
-import { VariantOutput } from "./types";
+import { Variant, VariantOutput, VIEW_TYPE_CONSOLE } from "./types";
 import { PrefixNotice } from "./utils";
 import RunCode from "./main";
 import { ConsoleModal } from "./ConsoleModal";
 import { Parse } from "./Parse";
+import { ConsoleView } from "./ConsoleView";
 
 export class Sandbox {
   app: App;
@@ -15,6 +16,12 @@ export class Sandbox {
   childProcess?: ChildProcess;
   modal?: ConsoleModal;
   parse: Parse;
+  lang?: string;
+  code?: string;
+  variant?: Variant;
+  view?: MarkdownView;
+  consoleView?: ConsoleView;
+  leaf?: WorkspaceLeaf;
 
   constructor(app: App, plugin: RunCode) {
     this.app = app;
@@ -25,25 +32,36 @@ export class Sandbox {
   init() {
     this.output = "";
     this.notice && delete this.notice;
-    this.modal && delete this.modal;
+    delete this.view;
+    delete this.lang;
+    delete this.code;
+    delete this.variant;
 
     this.childProcess?.kill();
     delete this.childProcess;
   }
 
-  async execCode(lang: string, code: string) {
+  async execCode(lang: string, code: string, view: MarkdownView) {
     const variant = this.getVariant(lang);
     if (!variant) {
       new PrefixNotice(`${lang} ${t("not find")}`);
       return;
     }
     this.init();
+    this.view = view;
+    this.lang = lang;
+    this.code = code;
+    this.variant = variant;
+
     const { outputType } = variant;
-    this.setStatus(outputType, "[running] generate code...");
-    const parsed = await this.parse.applyTemplate(variant, code);
+    await this.setStatus(outputType, "[running] generate code...");
+    const parsed = await this.parse.applyTemplate(variant, code, view);
+    if (!parsed) {
+      this.finished(outputType);
+      return;
+    }
     this.setStatus(outputType, "[running] waiting process stdout");
 
-    if (!parsed) return;
     const { command, options } = parsed;
     console.log("command: \n", command);
 
@@ -55,7 +73,7 @@ export class Sandbox {
         this.print(outputType, data.message);
       });
       this.childProcess.on("close", () => {
-        this.setStatus(outputType, `[close] ${t("ChildProcess is close.")}`);
+        this.finished(outputType);
         this.parse.clear();
       });
       this.childProcess.stdout!.on("data", (data) => {
@@ -78,25 +96,29 @@ export class Sandbox {
     }
   }
 
+  finished(outputType: VariantOutput) {
+    this.setStatus(outputType, `[finished] ${t("ChildProcess is close.")}`);
+  }
+
+  refresh() {
+    if (!this.view) {
+      return;
+    }
+    this.execCode(this.lang || "", this.code || "", this.view);
+  }
+
   print(outputType: VariantOutput, message: string) {
+    message = message.replace(/\[\d+m/g, "").replaceAll("\x1B", "");
     switch (outputType) {
       case VariantOutput.notice:
         this.output += message;
-        if (!this.notice) {
-          this.notice = new Notice(this.output);
-        } else {
-          this.notice.setMessage(this.output);
-        }
+        this.notice && this.notice.setMessage(this.output);
         break;
       case VariantOutput.modal:
-        if (!this.modal) {
-          this.modal = new ConsoleModal(this.app);
-          this.modal.open();
-        }
-
-        this.modal.setMessage(
-          message.replace(/\[\d+m/g, "").replaceAll("\x1B", "")
-        );
+        this.modal && this.modal.setMessage(message);
+        break;
+      case VariantOutput.view:
+        this.consoleView && this.consoleView.setMessage(message);
         break;
 
       case VariantOutput.console:
@@ -106,7 +128,7 @@ export class Sandbox {
     }
   }
 
-  setStatus(outputType: VariantOutput, message: string) {
+  async setStatus(outputType: VariantOutput, message: string) {
     switch (outputType) {
       case VariantOutput.notice:
         this.output += message;
@@ -118,11 +140,45 @@ export class Sandbox {
         break;
       case VariantOutput.modal:
         if (!this.modal) {
-          this.modal = new ConsoleModal(this.app);
+          this.modal = new ConsoleModal(this.app, {
+            refresh: this.refresh.bind(this),
+            close: () => {
+              delete this.modal;
+            },
+          });
           this.modal.open();
         }
 
         this.modal.setStatus(message);
+        break;
+      case VariantOutput.view:
+        if (!this.consoleView) {
+          const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_CONSOLE);
+          const [leaf] = leaves;
+          if (leaf) {
+            this.consoleView = leaf.view as ConsoleView;
+            this.consoleView.init({
+              refresh: this.refresh.bind(this),
+              close: () => {
+                delete this.consoleView;
+              },
+            });
+          }
+        }
+        if (!this.consoleView) {
+          this.leaf = this.app.workspace.getLeaf("split", "vertical");
+
+          this.consoleView = new ConsoleView(this.leaf);
+          this.consoleView.init({
+            refresh: this.refresh.bind(this),
+            close: () => {
+              delete this.consoleView;
+            },
+          });
+          await this.leaf.open(this.consoleView);
+        }
+
+        this.consoleView.setStatus(message);
         break;
 
       case VariantOutput.console:
@@ -130,6 +186,8 @@ export class Sandbox {
         console.log(message);
         break;
     }
+
+    return Promise.resolve();
   }
 
   getVariant(lang: string) {

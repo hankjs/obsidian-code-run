@@ -8,31 +8,7 @@
         "type": "tabs",
         "children": [
           {
-            "id": "dd1b4c638834acf2",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Export.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
             "id": "e68a38384a880ffe",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Include.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "a5e6b512b8545616",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -43,8 +19,21 @@
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
+      },
+      {
+        "id": "c3f74ae75a98afb9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "61af61773d6f3a4b",
+            "type": "leaf",
+            "state": {
+              "type": "VIEW_TYPE_CONSOLE",
+              "state": {}
+            }
+          }
+        ]
       }
     ],
     "direction": "vertical"
@@ -94,7 +83,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "9cda219285628117",
@@ -110,7 +100,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Include.md",
+                "file": "Javascript.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -127,7 +117,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Include.md",
+                "file": "Javascript.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -150,23 +140,23 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Include.md"
+                "file": "Javascript.md"
               }
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
-    "width": 300,
+    "width": 397.5,
     "collapsed": true
   },
-  "active": "e68a38384a880ffe",
+  "active": "61af61773d6f3a4b",
   "lastOpenFiles": [
-    "Export.md",
-    "Include.md",
     "Javascript.md",
+    "Include.md",
+    "Export.md",
     "Embeds.md",
     "Hello, World!.md"
   ]

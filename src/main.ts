@@ -1,5 +1,11 @@
-import { Plugin, PluginManifest, App } from "obsidian";
-import { Variant } from "./types";
+import {
+  Plugin,
+  PluginManifest,
+  App,
+  MarkdownView,
+  WorkspaceLeaf,
+} from "obsidian";
+import { Variant, VIEW_TYPE_CONSOLE } from "./types";
 import { RunCodeSettingsTab } from "./SettingsTab";
 import { Sandbox } from "./Sandbox";
 
@@ -7,6 +13,7 @@ import { DEFAULT_VARIANTS } from "./settings";
 import { getCodeByPreviewMode, getCodeByReadMode } from "./utils";
 
 import "./styles.scss";
+import { ConsoleView } from "./ConsoleView";
 
 interface RunCodeHTMLElement extends HTMLElement {
   __runCodeRegister?: boolean;
@@ -43,6 +50,10 @@ export default class RunCode extends Plugin {
     await this.loadSettings();
 
     this.addSettingTab(new RunCodeSettingsTab(this.app, this));
+    this.registerView(
+      VIEW_TYPE_CONSOLE,
+      (leaf: WorkspaceLeaf) => new ConsoleView(leaf)
+    );
 
     // this.addCommand({
     //   id: "snippets-plugin",
@@ -64,6 +75,22 @@ export default class RunCode extends Plugin {
         this.registerContainerClick(leaf.view.containerEl);
       })
     );
+
+    // Add the view to the right sidebar
+    if (this.app.workspace.layoutReady) {
+      this.initLeaf();
+    } else {
+      this.app.workspace.onLayoutReady(this.initLeaf.bind(this));
+    }
+  }
+
+  initLeaf() {
+    if (this.app.workspace.getLeavesOfType(VIEW_TYPE_CONSOLE).length) {
+      return;
+    }
+    this.app.workspace.getRightLeaf(false).setViewState({
+      type: VIEW_TYPE_CONSOLE,
+    });
   }
 
   registerContainerClick(el: RunCodeHTMLElement) {
@@ -76,11 +103,19 @@ export default class RunCode extends Plugin {
 
   containerClick(event: MouseEvent) {
     const target = event.target as RunCodeHTMLElement;
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (!view) {
+      return;
+    }
     switch (target.tagName.toLowerCase()) {
       case "div":
         if (target.classList.contains("HyperMD-codeblock-end")) {
           const processed = getCodeByPreviewMode(target);
-          this.sandbox.execCode(processed.lang.toLowerCase(), processed.code);
+          this.sandbox.execCode(
+            processed.lang.toLowerCase(),
+            processed.code,
+            view
+          );
         }
         break;
       case "pre":
@@ -90,7 +125,11 @@ export default class RunCode extends Plugin {
           ) > -1
         ) {
           const processed = getCodeByReadMode(target);
-          this.sandbox.execCode(processed.lang.toLowerCase(), processed.code);
+          this.sandbox.execCode(
+            processed.lang.toLowerCase(),
+            processed.code,
+            view
+          );
         }
         break;
 

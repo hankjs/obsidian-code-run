@@ -8,6 +8,7 @@ import {
   parseLinktext,
   resolveSubpath,
   TFile,
+  View,
 } from "obsidian";
 import RunCode from "./main";
 import { TEMP_DIR } from "./settings";
@@ -44,15 +45,14 @@ export class Parse {
     return file;
   }
 
-  getRuntimeVars() {
-    let active_view = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (active_view == null) {
+  getRuntimeVars(view: MarkdownView) {
+    if (view == null) {
       return null;
     }
 
     let { basePath } = this.app.vault.adapter as any;
-    let folder = active_view.file.parent.path;
-    let fileName = active_view.file.name;
+    let folder = view.file.parent.path;
+    let fileName = view.file.name;
 
     return {
       vault_path: basePath,
@@ -64,13 +64,13 @@ export class Parse {
 
   async applyTemplate(
     variant: Variant,
-    code: string
+    code: string,
+    view: MarkdownView
   ): Promise<{
     command: string;
     options: ExecOptions;
   } | void> {
-    let active_view = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (active_view == null) {
+    if (!view) {
       return;
     }
     this.clear();
@@ -81,7 +81,7 @@ export class Parse {
       runType = RunType.string,
     } = variant;
 
-    const runtimeVars: any = this.getRuntimeVars();
+    const runtimeVars: any = this.getRuntimeVars(view);
     if (!runtimeVars) return;
     const cwdPaths = ([] as string[])
       .concat(options?.cwd ?? "")
@@ -89,11 +89,7 @@ export class Parse {
     const cwd = variant.options?.cwd ? path.join(...cwdPaths) : "";
     options.cwd = cwd;
 
-    const parsedCode = await this.resolveDependencies(
-      variant,
-      code,
-      active_view.file
-    );
+    const parsedCode = await this.resolveDependencies(variant, code, view.file);
     if (!parsedCode) return;
 
     let result = template;
@@ -121,10 +117,6 @@ export class Parse {
       command: templateByObj(result, runtimeVars),
       options: options as ExecOptions,
     };
-  }
-
-  get activeView() {
-    return this.app.workspace.getActiveViewOfType(MarkdownView);
   }
 
   async resolveDependencies(variant: Variant, code: string, file: TFile) {

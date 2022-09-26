@@ -11,7 +11,7 @@ export const DEFAULT_VARIANTS: Record<string, Variant> = {
     template: 'node "{{src}}"',
     ext: "mjs",
     runType: RunType.file,
-    outputType: VariantOutput.modal,
+    outputType: VariantOutput.view,
   },
   "ts,typescript": {
     template: 'ts-node "{{src}}"',

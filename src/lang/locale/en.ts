@@ -5,5 +5,6 @@ export default {
   CodeRunner: "CodeRunner",
   "not find": "not find",
   Clear: "Clear",
+  Restart: "Restart",
   "ChildProcess is close.": "ChildProcess is close.",
 };

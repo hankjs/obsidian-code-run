@@ -1,47 +1,37 @@
 import { App, ButtonComponent, Modal } from "obsidian";
 import { t } from "./lang/helpers";
+import { Console } from "./Console";
 
 export class ConsoleModal extends Modal {
-  val!: string;
-  consoleEl!: HTMLElement;
-  titleStatusEl?: HTMLSpanElement;
-  constructor(app: App) {
+  events?: { refresh: Function; close: Function };
+  console: Console;
+  constructor(
+    app: App,
+    events: {
+      refresh: Function;
+      close: Function;
+    }
+  ) {
     super(app);
+    this.events = events;
+    this.console = new Console(this);
   }
 
   onOpen() {
-    this.titleEl.setText(t("CodeRunner Console"));
-    this.titleStatusEl = createEl("span");
-    this.titleStatusEl.addClass("code-runner-title-status");
-    this.titleEl.appendChild(this.titleStatusEl);
-
-    this.clearButton(this.contentEl);
-
-    this.consoleEl = createEl("pre");
-    this.consoleEl.addClass("code-runner-console");
-    this.contentEl.appendChild(this.consoleEl);
-    this.val = "";
+    this.console.init(this.contentEl, this.titleEl);
+    this.console.render();
   }
 
   setStatus(str: string) {
-    this.titleStatusEl?.setText(str);
+    this.console.setStatus(str);
   }
 
   setMessage(message: string) {
-    this.val += message;
-    this.consoleEl.setText(this.val);
+    this.console.setMessage(message);
   }
 
   onClose() {
-    this.val = "";
-  }
-
-  clearButton(el: HTMLElement) {
-    const btn = new ButtonComponent(el);
-    btn.setButtonText(t("Clear"));
-    btn.onClick(() => {
-      this.val = "";
-      this.setMessage("");
-    });
+    this.console.clear();
+    this.events?.close();
   }
 }

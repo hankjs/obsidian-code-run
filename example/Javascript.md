@@ -7,6 +7,10 @@ setTimeout(() => {
 }, 2000)
 ```
 
+```js
+console.log(1)  
+```
+
 Error code
 
 ```javascript
